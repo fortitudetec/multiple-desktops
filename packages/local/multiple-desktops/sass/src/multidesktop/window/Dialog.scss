@@ -1,0 +1,23 @@
+.ftde-dialog {
+  .ftde-dialog-html-body {
+    display: table-cell;
+    padding: 5px;
+    vertical-align: middle;
+  }
+
+  .ftde-dialog-icon {
+    font-size: 3em;
+  }
+
+  .ftde-dialog-icon-error {
+    color: #f00;
+  }
+
+  .ftde-dialog-icon-question {
+    color: #1e90ff;
+  }
+
+  .ftde-dialog-icon-warning {
+    color: #daa520;
+  }
+}
