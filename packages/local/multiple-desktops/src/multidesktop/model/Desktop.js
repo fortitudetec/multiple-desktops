@@ -1,4 +1,4 @@
-Ext.define('Fortitude.multidesktop.model.Desktop', {
+Ext.define('Ft.multidesktop.model.Desktop', {
   extend: 'Ext.data.Model',
 
   fields: ['sessionPrefix', 'title'],

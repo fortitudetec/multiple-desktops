@@ -1,10 +1,10 @@
-Ext.define('Fortitude.multidesktop.window.plugin.DesktopMovable', {
+Ext.define('Ft.multidesktop.window.plugin.DesktopMovable', {
   extend: 'Ext.plugin.Abstract',
   alias: 'plugin.ft-desktopmovable',
 
   init: function(cmp) {
     const sendToDesktopMenu = new Ext.menu.Menu(),
-      DesktopManager = Fortitude.multidesktop.util.DesktopManager,
+      DesktopManager = Ft.multidesktop.util.DesktopManager,
       application = Ext.getApplication(),
       desktopId = application && application.getId(),
       controller = cmp.lookupController();
@@ -40,7 +40,7 @@ Ext.define('Fortitude.multidesktop.window.plugin.DesktopMovable', {
                     console.trace(e);
                     debugger;
                   }
-                  new Fortitude.multidesktop.window.Dialog({
+                  new Ft.multidesktop.window.Dialog({
                     title: 'Error',
                     html: `<p>Could not move Widget to ${item.text}:<br/>${e.message}</p>`,
                     teatherTo: cmp
@@ -51,7 +51,7 @@ Ext.define('Fortitude.multidesktop.window.plugin.DesktopMovable', {
         });
         DesktopManager.isManagingDesktop() && menuItems.push({
           text: 'New Desktop...',
-          cls: 'desktopmovable-new-desktop-item',
+          cls: 'ft-desktopmovable-new-desktop-item',
           handler: () => DesktopManager.launchChildDesktop().then((newDesktop) => {
             Ext.defer(() => {
               DesktopManager.moveToDesktop(cmp, newDesktop.getId());
@@ -90,11 +90,9 @@ Ext.define('Fortitude.multidesktop.window.plugin.DesktopMovable', {
     });
   }
 }, function() {
-  // NOTE: This is processed on the TARGET Desktop (e.g., the Desktop the Widget is being moved to).
-  Ext.on('desktop.movetodesktop', function(oldDesktopId, newDesktopId, cfg) {
+  const completeMoveFn = function(desktop, oldDesktopId, newDesktopId, cfg) {
     try {
-      const desktop = Ext.getApplication().getMainView().getDesktop(),
-        movable = desktop.createWindow(Ext.clone(cfg)).show(),
+      const movable = desktop.createWindow(Ext.clone(cfg)).show(),
         ownerWidget = movable.getOwnerWidget();
       Ext.fireEvent({
         source: newDesktopId,
@@ -113,5 +111,15 @@ Ext.define('Fortitude.multidesktop.window.plugin.DesktopMovable', {
         eventName: 'desktop.movetodesktopfailure'
       }, oldDesktopId, newDesktopId, cfg, {sourceClass: e.sourceClass, sourceMethod: e.sourceMethod, message: e.message, stack: e.stack});
     }
+  };
+
+  // NOTE: This is processed on the TARGET Desktop (e.g., the Desktop the Widget is being moved to).
+  Ext.on('desktop.movetodesktop', function(oldDesktopId, newDesktopId, cfg) {
+    const mainView = Ext.getApplication().getMainView();
+
+    // TODO: Replace this w/ a 'callWhen'
+    mainView.isReady ?
+      completeMoveFn(mainView.getDesktop(), oldDesktopId, newDesktopId, cfg) :
+      mainView.on('ready', () => completeMoveFn(mainView.getDesktop(), oldDesktopId, newDesktopId, cfg));
   });
 });

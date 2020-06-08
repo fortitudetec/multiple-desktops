@@ -1,6 +1,6 @@
-Ext.define('Fortitude.multidesktop.ui.desktopmanager.Controller', {
+Ext.define('Ft.multidesktop.ui.desktopmanager.Controller', {
   extend: 'Ext.app.ViewController',
-  alias: 'controller.ftde-desktopmanager',
+  alias: 'controller.ft-desktopmanager',
 
   config: {
     selectedDesktop: null
@@ -13,20 +13,20 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.Controller', {
   },
 
   init: function() {
-    const localLogStorageId = Fortitude.multidesktop.util.DesktopManager.getLocalLogStorageId(),
+    const localLogStorageId = Ft.multidesktop.util.DesktopManager.getLocalLogStorageId(),
       logStorage = Ext.JSON.decode(window.localStorage.getItem(localLogStorageId), true) || [],
       store = new Ext.data.Store({
-        model: 'Fortitude.multidesktop.model.DesktopStatus',
+        model: 'Ft.multidesktop.model.DesktopStatus',
         data: logStorage,
         sorters: [{property: 'timestamp', direction: 'ASC'}]
       });
 
     this.callParent(arguments);
-    this.lookup('maxLogLength').setValue(Fortitude.multidesktop.util.DesktopManager.getMaxLogLength());
+    this.lookup('maxLogLength').setValue(Ft.multidesktop.util.DesktopManager.getMaxLogLength());
     this.lookup('desktopManagerViewLog').setStore(store);
     this.storageEventListener = this.onLogUpdated.bind(this);
     window.addEventListener('storage', this.storageEventListener);
-    this.mon(Fortitude.multidesktop.util.DesktopManager, {
+    this.mon(Ft.multidesktop.util.DesktopManager, {
       loglengthchanged: this.onLogLengthChanged,
       logupdated: this.onRefreshLog,
       closing: this.onLocalWidgetClosing,
@@ -46,7 +46,7 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.Controller', {
   },
 
   onClearLog: function() {
-    const localLogStorageId = Fortitude.multidesktop.util.DesktopManager.getLocalLogStorageId();
+    const localLogStorageId = Ft.multidesktop.util.DesktopManager.getLocalLogStorageId();
     window.localStorage.setItem(localLogStorageId, '[]');
     this.lookup('desktopManagerViewLog').getStore().removeAll();
   },
@@ -57,26 +57,26 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.Controller', {
   },
 
   onCloseDesktop: function(grid, row, col, cfg, evt, desktop) {
-    new Fortitude.multidesktop.window.Dialog({
+    new Ft.multidesktop.window.Dialog({
       teatherTo: this.getView(),
       title: 'Confirm',
       html: `<p style='padding-left:5px;padding-right:5px'>Are you certain you want to close ${desktop.get('title')}?<br/><br/>
              NOTE: This may affect Widgets running on other Desktops.</p>`,
       listeners: {
-        ok: () => Fortitude.multidesktop.util.DesktopManager.closeDesktop(desktop)
+        ok: () => Ft.multidesktop.util.DesktopManager.closeDesktop(desktop)
       }
     }).show();
   },
 
   onCloseWidget: function(grid, row, col, cfg, evt, record) {
     const desktop = this.getSelectedDesktop();
-    new Fortitude.multidesktop.window.Dialog({
+    new Ft.multidesktop.window.Dialog({
       teatherTo: this.getView(),
       title: 'Confirm',
       html: `<p style='padding-left:5px;padding-right:5px'>Are you certain you want to close the widget '${record.get('text')}'
              <br/>running on ${desktop.get('title')}?</p>`,
       listeners: {
-        ok: () => Fortitude.multidesktop.util.DesktopManager.closeWidget(this.getSelectedDesktop(), record.getId())
+        ok: () => Ft.multidesktop.util.DesktopManager.closeWidget(this.getSelectedDesktop(), record.getId())
       }
     }).show();
   },
@@ -96,7 +96,7 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.Controller', {
   },
 
   onLogUpdated: function(evt) {
-    if (evt.key === Fortitude.multidesktop.util.DesktopManager.getLocalLogStorageId()) {
+    if (evt.key === Ft.multidesktop.util.DesktopManager.getLocalLogStorageId()) {
       const data = Ext.JSON.decode(evt.newValue);
       this.lookup('desktopManagerViewLog').getStore().loadRawData(data, false);
     }
@@ -108,7 +108,7 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.Controller', {
 
   onResetDesktopEnvironment: function() {
     const env = S(window.desktop.environment).humanize().titleCase();
-    new Fortitude.multidesktop.window.Dialog({
+    new Ft.multidesktop.window.Dialog({
       title: 'Warning',
       okButtonText: 'Continue',
       html: `<div style='padding:5px'><p>Warning</p><p>Resetting the Desktop environment will close all windows and tabs for the ${env}
@@ -117,7 +117,7 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.Controller', {
         ok: () => {
           // Fire off a new 'ping' (one ping only), then reinstitute our timer. If the single ping fails, it will 'uninterval' the newly
           // created interval.
-          Fortitude.multidesktop.util.DesktopManager.reset();
+          Ft.multidesktop.util.DesktopManager.reset();
         }
       }
     }).show();
@@ -125,11 +125,11 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.Controller', {
 
   onSetLogLength: function(combo, value) {
     // This call fires 'loglengthchanged', which we listen to. Setting the log length is asynchronus, so refreshing here does nothing.
-    Fortitude.multidesktop.util.DesktopManager.setMaxLogLength(value);
+    Ft.multidesktop.util.DesktopManager.setMaxLogLength(value);
   },
 
   onLocalWidgetClosing: function(widgetId) {
-    this.onWidgetClosing(Fortitude.multidesktop.util.DesktopManager.getDesktopId(), widgetId);
+    this.onWidgetClosing(Ft.multidesktop.util.DesktopManager.getDesktopId(), widgetId);
   },
 
   onWidgetClosing: function(desktopId, widgetId) {
@@ -168,7 +168,7 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.Controller', {
   },
 
   refreshLog: function() {
-    const localLogStorageId = Fortitude.multidesktop.util.DesktopManager.getLocalLogStorageId(),
+    const localLogStorageId = Ft.multidesktop.util.DesktopManager.getLocalLogStorageId(),
       jsonData = window.localStorage.getItem(localLogStorageId) || '[]',
       logData = Ext.JSON.decode(jsonData);
 
@@ -183,7 +183,7 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.Controller', {
     // Since we're getting the list of widgets from the taskbar, and the displaying of the widget contains an animation, we need to delay
     // the initial selection to give ouselves an opportunity to be put into the taskbar.
     Ext.defer(() => {
-      Fortitude.multidesktop.util.DesktopManager.listRunningWidgets(record.getId()).then((response) => {
+      Ft.multidesktop.util.DesktopManager.listRunningWidgets(record.getId()).then((response) => {
         widgets.getStore().setData(response);
       });
     }, 100);

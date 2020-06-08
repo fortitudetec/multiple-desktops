@@ -17,7 +17,7 @@
           * As a general rule, all classes that belong to this package should be under this namespace
           * if multiple namespaces are part of this package, set this to "".
           */
-         "namespace": "Multiple.desktops",
+         "namespace": "Ft",
 
         /**
          * The package type.
@@ -37,7 +37,7 @@
          *
          *    "toolkit": "classic",
          */
-        "toolkit": "",
+        "toolkit": "classic",
 
          /**
           * The author of the package.
@@ -108,6 +108,7 @@
          *
          *     "theme": "ext-theme-classic",
          */
+         "theme": "ext-theme-classic",
 
         /**
          * Sass configuration properties.
@@ -123,7 +124,7 @@
              * then to style "Multiple.desktops.panel.Panel" you would put SASS in
              * ./sass/src/Multiple.desktops/panel/Panel.scss.
              */
-            "namespace": "Multiple.desktops",
+            "namespace": "Ft",
 
             /**
              * Comma-separated list of files or folders containing extra Sass. These
@@ -238,6 +239,7 @@
          *
          *     "framework": "ext",
          */
+         "framework": "ext",
 
         /**
          * Packages can require other packages in the same way that applications can require
@@ -264,6 +266,6 @@
          *          }
          *      }
          */
-        "requires": []
+        "requires": ["ux"]
     }
 }

@@ -1,6 +1,6 @@
-Ext.define('Fortitude.multidesktop.window.Dialog', {
+Ext.define('Ft.multidesktop.window.Dialog', {
   extend: 'Ext.window.Window',
-  alias: 'widget.ftde-dialog',
+  alias: 'widget.ft-dialog',
 
   showButtons: true,
   okButtonText: 'Ok',
@@ -76,7 +76,7 @@ Ext.define('Fortitude.multidesktop.window.Dialog', {
       if (this.html) {
         this.items = {
           xtype: 'component',
-          cls: 'ftde-dialog-html-body',
+          cls: 'ft-dialog-html-body',
           html: this.html
         };
         // so we don't step on the 'html' property of the Window
@@ -111,12 +111,12 @@ Ext.define('Fortitude.multidesktop.window.Dialog', {
   },
 
   statics: {
-    ERROR: 'x-fa fas fa-exclamation-circle ftde-dialog-icon ftde-dialog-icon-error',
-    QUESTION: 'x-fa fas fa-question-circle ftde-dialog-icon ftde-dialog-icon-question',
-    WARNING: 'x-fa fas fa-exclamation-triangle ftde-dialog-icon ftde-dialog-icon-warning',
+    ERROR: 'x-fa fas fa-exclamation-circle ft-dialog-icon ft-dialog-icon-error',
+    QUESTION: 'x-fa fas fa-question-circle ft-dialog-icon ft-dialog-icon-question',
+    WARNING: 'x-fa fas fa-exclamation-triangle ft-dialog-icon ft-dialog-icon-warning',
 
     errorDialog: function(config) {
-      new Fortitude.multidesktop.window.Dialog(Ext.apply({
+      new Ft.multidesktop.window.Dialog(Ext.apply({
         title: 'Error',
         icon: this.ERROR,
         showCancelButton: false
