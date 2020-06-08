@@ -1,4 +1,4 @@
-Ext.define('Fortitude.multidesktop.ui.desktopmanager.Module', {
+Ext.define('Ft.multidesktop.ui.desktopmanager.Module', {
   extend: 'Ext.ux.desktop.Module',
 
   id: 'desktopmanager',
@@ -9,22 +9,22 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.Module', {
       iconCls: 'x-fa fas fa-chalkboard-teacher',
       handler: this.createWindow,
       scope: this,
-      windowId: 'ftde-desktop-manager'
+      windowId: 'ft-desktop-manager'
     };
   },
 
   createWindow: function() {
     const desktop = this.app.getDesktop(),
-      win = desktop.getWindow('ftde-desktop-manager') || desktop.createWindow({
-        id: 'ftde-desktop-manager',
+      win = desktop.getWindow('ft-desktop-manager') || desktop.createWindow({
+        id: 'ft-desktop-manager',
         controller: {
-          type: 'ftde-desktopmanager'
+          type: 'ft-desktopmanager'
         },
         title: this.launcher.text,
         iconCls: 'x-fa fas fa-chalkboard-teacher',
         constrainHeader: true,
         items: {
-          xtype: 'ftde-desktopmanagerview',
+          xtype: 'ft-desktopmanagerview',
           reference: 'desktopManagerView',
           width: 1200,
           height: 600

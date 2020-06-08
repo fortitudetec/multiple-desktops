@@ -1,6 +1,6 @@
-Ext.define('Fortitude.multidesktop.ui.desktopmanager.View', {
+Ext.define('Ft.multidesktop.ui.desktopmanager.View', {
   extend: 'Ext.panel.Panel',
-  alias: 'widget.ftde-desktopmanagerview',
+  alias: 'widget.ft-desktopmanagerview',
   layout: 'border',
 
   initComponent: function() {
@@ -20,7 +20,7 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.View', {
         xtype: 'grid',
         flex: 1,
         collapsible: false,
-        store: Fortitude.multidesktop.util.DesktopManager.getDesktops(),
+        store: Ft.multidesktop.util.DesktopManager.getDesktops(),
         columns: [{
           dataIndex: 'title',
           flex: 1,
@@ -35,10 +35,10 @@ Ext.define('Fortitude.multidesktop.ui.desktopmanager.View', {
           width: 50,
           items: [{
             getClass: (value, meta, record) => {
-              return Fortitude.multidesktop.util.DesktopManager.getDesktopId() === record.getId() ? '' : 'x-fa far fa-window-close red-foreground';
+              return Ft.multidesktop.util.DesktopManager.getDesktopId() === record.getId() ? '' : 'x-fa far fa-window-close red-foreground';
             },
             getTip: (value, meta, record) => {
-              return Fortitude.multidesktop.util.DesktopManager.getDesktopId() === record.getId() ? null : 'Close this Desktop';
+              return Ft.multidesktop.util.DesktopManager.getDesktopId() === record.getId() ? null : 'Close this Desktop';
             },
             handler: 'onCloseDesktop'
           }]

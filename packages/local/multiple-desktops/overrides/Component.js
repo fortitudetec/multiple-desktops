@@ -1,9 +1,9 @@
-Ext.define('Fortitude.multidesktop.override.Component', {
+Ext.define('Ft.multidesktop.override.Component', {
   override: 'Ext.Component',
 
   getId: function() {
     const generatedId = !(this.id || (this.id = this.initialConfig.id)),
-      desktopPrefix = `ftde-${window.desktop.desktopId}-`,
+      desktopPrefix = `ft-${window.desktop.desktopId}-`,
       regexp = new RegExp(desktopPrefix);
 
     this.callParent(arguments);

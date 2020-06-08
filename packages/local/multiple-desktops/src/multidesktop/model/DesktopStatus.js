@@ -1,4 +1,4 @@
-Ext.define('Fortitude.multidesktop.model.DesktopStatus', {
+Ext.define('Ft.multidesktop.model.DesktopStatus', {
   extend: 'Ext.data.Model',
 
   fields: [
@@ -9,10 +9,10 @@ Ext.define('Fortitude.multidesktop.model.DesktopStatus', {
 
   hasOne: [{
     name: 'sourceDesktop',
-    model: 'Fortitude.multidesktop.model.Desktop'
+    model: 'Ft.multidesktop.model.Desktop'
   }, {
     name: 'targetDesktop',
-    model: 'Fortitude.multidesktop.model.Desktop'
+    model: 'Ft.multidesktop.model.Desktop'
   }],
 
   proxy: {

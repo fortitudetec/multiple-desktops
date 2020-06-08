@@ -1,4 +1,4 @@
-Ext.define('Fortitude.multidesktop.override.GlobalEvents', {
+Ext.define('Ft.multidesktop.override.GlobalEvents', {
   override: 'Ext.GlobalEvents',
 
   fireEvent: function() {
@@ -15,7 +15,7 @@ Ext.define('Fortitude.multidesktop.override.GlobalEvents', {
      */
     if (Ext.isObject(broadcastArgs)) {
       const target = broadcastArgs.target,
-        desktopId = Fortitude.multidesktop.util.DesktopManager.getDesktopId(),
+        desktopId = Ft.multidesktop.util.DesktopManager.getDesktopId(),
         eventArguments = Ext.Array.slice(arguments, 1, arguments.length);
 
       // Looks confusing, but here's the logic:
@@ -28,7 +28,7 @@ Ext.define('Fortitude.multidesktop.override.GlobalEvents', {
       }
       if (target !== desktopId) {
         const broadcastChannel = this.getBroadcastChannel();
-        Fortitude.multidesktop.util.DesktopManager.logOutgoingDesktopEvent(broadcastArgs.eventName, desktopId, desktopId, broadcastArgs.target);
+        Ft.multidesktop.util.DesktopManager.logOutgoingDesktopEvent(broadcastArgs.eventName, desktopId, desktopId, broadcastArgs.target);
         broadcastChannel.postMessage(Ext.apply(broadcastArgs, {eventArguments: eventArguments}));
       }
 
@@ -53,7 +53,7 @@ Ext.define('Fortitude.multidesktop.override.GlobalEvents', {
     if (data.eventName && (data.source !== myId)) {
       // If a target was not specified, or if one was, and its us, fire the event.
       if (!data.target || (data.target === myId)) {
-        Fortitude.multidesktop.util.DesktopManager.logIncomingDesktopEvent(data.eventName, myId, data.source, data.target);
+        Ft.multidesktop.util.DesktopManager.logIncomingDesktopEvent(data.eventName, myId, data.source, data.target);
         this.fireEventArgs(data.eventName, data.eventArguments);
       }
     }

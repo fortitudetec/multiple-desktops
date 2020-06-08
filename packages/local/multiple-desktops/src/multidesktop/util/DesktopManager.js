@@ -1,4 +1,4 @@
-Ext.define('Fortitude.multidesktop.util.DesktopManager', {
+Ext.define('Ft.multidesktop.util.DesktopManager', {
   mixins: ['Ext.mixin.Observable'],
   singleton: true,
 
@@ -25,7 +25,7 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
 
   constructor: function(config) {
     this.mixins.observable.constructor.call(this, config);
-    this.setDesktops(new Ext.data.Store({model: 'Fortitude.multidesktop.model.Desktop'}));
+    this.setDesktops(new Ext.data.Store({model: 'Ft.multidesktop.model.Desktop'}));
 
     this.setDesktopId(window.desktop.desktopId);
     window.desktop.parentDesktopId && this.setParentDesktopId(window.desktop.parentDesktopId);
@@ -248,11 +248,11 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
       btn = desktop.taskbar.tray.insert(0, {
         xtype: 'button',
         itemId: 'desktopsBtn',
-        cls: 'ftde-multidesktop-desktopsbtn',
+        cls: 'ft-multidesktop-desktopsbtn',
         iconCls: 'x-fa fas fa-desktop',
         showEmptyMenu: true,
         menu: {
-          cls: 'ftde-multidesktop-desktopsmenu',
+          cls: 'ft-multidesktop-desktopsmenu',
           itemId: 'desktopsMenu'
         }
       });
@@ -267,7 +267,7 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
     } else {
       btn.getMenu().add([{
         iconCls: 'x-fa fas fa-plus',
-        cls: 'ftde-multidesktop-launchnewdesktop',
+        cls: 'ft-multidesktop-launchnewdesktop',
         itemId: 'launchNewDesktopBtn',
         text: 'Launch a new Desktop',
         handler: this.onLaunchChildDesktop.bind(this)
@@ -454,9 +454,9 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
       // Since the eventual log is written at a later date (see note on defer below), we need to get the data here as there is a chance
       // that the desktop will be gone by the time we get around to the actual writing (e.g., desktop.close).
       desktops = this.getDesktops(),
-      sourceDesktop = desktops.getById(sourceDesktopId) || new Fortitude.multidesktop.model.Desktop({id: sourceDesktopId}),
+      sourceDesktop = desktops.getById(sourceDesktopId) || new Ft.multidesktop.model.Desktop({id: sourceDesktopId}),
       sourceDesktopData = sourceDesktop && Ext.clone(sourceDesktop.getData()),
-      targetDesktop = targetDesktopId && (desktops.getById(targetDesktopId) || new Fortitude.multidesktop.model.Desktop({id: targetDesktopId})),
+      targetDesktop = targetDesktopId && (desktops.getById(targetDesktopId) || new Ft.multidesktop.model.Desktop({id: targetDesktopId})),
       targetDesktopData = targetDesktop && Ext.clone(targetDesktop.getData());
 
     let logEntry,
@@ -494,7 +494,7 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
 
     Ext.fireEvent(
         {source: this.getDesktopId(), eventName: 'desktop.childregistered'},
-        childId, desktops.getData().getValues('data'), Fortitude.multidesktop.util.DesktopManager.VERSION);
+        childId, desktops.getData().getValues('data'), Ft.multidesktop.util.DesktopManager.VERSION);
 
     // Fire a local event. This is really for the 'Launch a new Desktop and move my Widget there' feature.
     this.fireEvent('childregistered', desktops.getById(childId), desktops);
@@ -561,11 +561,11 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
   },
 
   onOrphanedDesktop: function() {
-    const parent = Fortitude.multidesktop.util.DesktopManager.getDesktops().findRecord('id', Fortitude.multidesktop.util.DesktopManager.getParentDesktopId()),
+    const parent = Ft.multidesktop.util.DesktopManager.getDesktops().findRecord('id', Ft.multidesktop.util.DesktopManager.getParentDesktopId()),
       parentTitle = (parent && parent.get('title')) || 'Unknown Parent';
 
     Ext.uninterval(this.pingInterval);
-    new Fortitude.multidesktop.window.Dialog({
+    new Ft.multidesktop.window.Dialog({
       title: 'Fatal Error',
       okButtonText: 'Reconnect',
       cancelButtonText: 'Close Desktop',
@@ -615,7 +615,7 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
         this.getDesktops().setData(desktops);
         const record = this.getDesktops().getById(this.getDesktopId());
         window.document.title = record.get('title');
-        (version !== Fortitude.multidesktop.util.DesktopManager.VERSION) && this._showVersionMismatchWarning(version);
+        (version !== Ft.multidesktop.util.DesktopManager.VERSION) && this._showVersionMismatchWarning(version);
         (record.getId() === newDesktopId) && (this.pingInterval = Ext.interval(this.onPingParentDesktop, 300000, this));
       };
     if (mainView.isReady) {
@@ -635,7 +635,7 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
   privates: {
     _addDesktop: function(id) {
       const desktops = this.getDesktops(),
-        desktop = new Fortitude.multidesktop.model.Desktop({id: id, sessionPrefix: this.getSessionPrefix()});
+        desktop = new Ft.multidesktop.model.Desktop({id: id, sessionPrefix: this.getSessionPrefix()});
 
       desktops.add(desktop);
       const title = this._generateDesktopTitle(this.getSessionPrefix(), desktops.getCount());
@@ -653,15 +653,15 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
 
     _onBeforeChooserMenuShow: function(menu) {
       const myId = this.getDesktopId();
-      Ext.each(menu.query('[cls~=ftde-multidesktop-chooser-item]'), (menuItem) => menu.remove(menuItem));
+      Ext.each(menu.query('[cls~=ft-multidesktop-chooser-item]'), (menuItem) => menu.remove(menuItem));
       this.getDesktops().each((desktop) => {
         const id = desktop.getId(),
           title = desktop.get('title');
         menu.add({
           iconCls: 'x-fa fas fa-desktop',
-          cls: 'ftde-multidesktop-chooser-item',
+          cls: 'ft-multidesktop-chooser-item',
           text: title,
-          itemId: `ftde-multidesktop-${id}`,
+          itemId: `ft-multidesktop-${id}`,
           tooltip: `Bring desktop ${title} to the front`,
           handler: () => Ext.fireEvent({source: myId, target: id, eventName: 'desktop.tofront'})
         });
@@ -678,7 +678,7 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
     },
 
     _showVersionMismatchWarning: function(version) {
-      new Fortitude.multidesktop.window.Dialog({
+      new Ft.multidesktop.window.Dialog({
         title: 'Warning',
         showButtons: false,
         height: 175,
@@ -688,7 +688,7 @@ Ext.define('Fortitude.multidesktop.util.DesktopManager', {
                <div style='padding-left: 20px; padding-right: 20px'>
                   <table>
                     <tr><td>${this.getDesktops().first().get('title')}:</td><td>${version}</td></tr>
-                    <tr><td>${window.document.title}:</td><td>${Fortitude.multidesktop.util.DesktopManager.VERSION}</td></tr>
+                    <tr><td>${window.document.title}:</td><td>${Ft.multidesktop.util.DesktopManager.VERSION}</td></tr>
                   </table>
                </div>
                <p style='padding-left: 10px; padding-right: 10px'>

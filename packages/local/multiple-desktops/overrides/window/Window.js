@@ -1,4 +1,4 @@
-Ext.define('Fortitude.multidesktop.override.window.Window', {
+Ext.define('Ft.multidesktop.override.window.Window', {
   override: 'Ext.window.Window',
 
   layout: 'fit',
@@ -38,7 +38,7 @@ Ext.define('Fortitude.multidesktop.override.window.Window', {
         },
         destroyable: true
       });
-      this.desktopManagerListener = Fortitude.multidesktop.util.DesktopManager.on({
+      this.desktopManagerListener = Ft.multidesktop.util.DesktopManager.on({
         'closing': (desktopId) => {
           // The 'closing' event is fired first locally, then globally (as 'desktop.closing'). This allows local Widgets to notify
           // owners they are closing down, just in case they are on separate desktops.
@@ -62,7 +62,7 @@ Ext.define('Fortitude.multidesktop.override.window.Window', {
   },
 
   notifyClosing: function() {
-    const desktopId = Fortitude.multidesktop.util.DesktopManager.getDesktopId();
+    const desktopId = Ft.multidesktop.util.DesktopManager.getDesktopId();
     this.desktopMovable && !this.getId().match(/-ghost$/) && Ext.fireEvent({
       source: desktopId,
       eventName: 'desktop.windowclosing'
