@@ -21,7 +21,7 @@ Ext.define('Ft.multidesktop.override.window.Window', {
       });
     }
     this.desktopEvents = Ext.GlobalEvents.on({
-      'desktop.movetowidgetfront': (widgetId) => {
+      'ft.multidesktop.movetowidgetfront': (widgetId) => {
         (this.getId() === widgetId) && this.toFront();
       },
       destroyable: true
@@ -33,7 +33,7 @@ Ext.define('Ft.multidesktop.override.window.Window', {
     this.desktopManagerListener && this.desktopManagerListener.destroy();
     if (ownerWidget) {
       this.ownerWidgetListener = Ext.on({
-        'desktop.movetodesktopsuccess': (oldDesktopId, newDesktopId, cfg, widgetId) => {
+        'ft.multidesktop.movetodesktopsuccess': (oldDesktopId, newDesktopId, cfg, widgetId) => {
           ownerWidget.id === widgetId && ownerWidget.desktopId === oldDesktopId && (ownerWidget.desktopId = newDesktopId);
         },
         destroyable: true
@@ -53,7 +53,7 @@ Ext.define('Ft.multidesktop.override.window.Window', {
         destroyable: true
       });
     }
-    this.fireEvent('ownerwidgetset', this, ownerWidget);
+    this.fireEvent('ft.multidesktop.ownerwidgetset', this, ownerWidget);
   },
 
   onDestroy: function() {
@@ -65,7 +65,7 @@ Ext.define('Ft.multidesktop.override.window.Window', {
     const desktopId = Ft.multidesktop.util.DesktopManager.getDesktopId();
     this.desktopMovable && !this.getId().match(/-ghost$/) && Ext.fireEvent({
       source: desktopId,
-      eventName: 'desktop.windowclosing'
+      eventName: 'ft.multidesktop.windowclosing'
     }, desktopId, this.getId());
   }
 });
