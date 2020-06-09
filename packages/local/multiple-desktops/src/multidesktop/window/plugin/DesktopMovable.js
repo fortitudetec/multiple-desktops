@@ -71,7 +71,7 @@ Ext.define('Ft.multidesktop.window.plugin.DesktopMovable', {
     cmp.getOwnerWidget() && this.addListeners();
     Ext.fireEvent({
       source: desktopId,
-      eventName: 'desktop.movablewidgetlaunched'
+      eventName: 'ft.multidesktop.movablewidgetlaunched'
     }, desktopId, cmp.getId());
   },
 
@@ -79,7 +79,7 @@ Ext.define('Ft.multidesktop.window.plugin.DesktopMovable', {
     const movable = this.getCmp();
 
     this.movableListeners = Ext.on({
-      'desktop.windowclosing': (desktopId, widgetId) => {
+      'ft.multidesktop.windowclosing': (desktopId, widgetId) => {
         const ownerWidget = movable.getOwnerWidget();
         if ((desktopId === ownerWidget.desktopId) && (widgetId === ownerWidget.id)) {
           this.movableListeners.destroy();
@@ -96,25 +96,25 @@ Ext.define('Ft.multidesktop.window.plugin.DesktopMovable', {
         ownerWidget = movable.getOwnerWidget();
       Ext.fireEvent({
         source: newDesktopId,
-        eventName: 'desktop.movetodesktopsuccess'
+        eventName: 'ft.multidesktop.movetodesktopsuccess'
       }, oldDesktopId, newDesktopId, cfg, movable.getId());
       // Fire an event locally from the moved widget. This allows the widget itself the opportunity to notify any child widgets of its move.
       movable.fireEvent('movetodesktopsuccess', movable, newDesktopId, oldDesktopId);
       ownerWidget && Ext.fireEvent({
         source: newDesktopId,
         target: ownerWidget.desktopId,
-        eventName: 'webstringer.desktop.managedwidgetmoved'
+        eventName: 'ft.multidesktop.managedwidgetmoved'
       }, movable.getId(), newDesktopId);
     } catch (e) {
       Ext.fireEvent({
         source: newDesktopId,
-        eventName: 'desktop.movetodesktopfailure'
+        eventName: 'ft.multidesktop.movetodesktopfailure'
       }, oldDesktopId, newDesktopId, cfg, {sourceClass: e.sourceClass, sourceMethod: e.sourceMethod, message: e.message, stack: e.stack});
     }
   };
 
   // NOTE: This is processed on the TARGET Desktop (e.g., the Desktop the Widget is being moved to).
-  Ext.on('desktop.movetodesktop', function(oldDesktopId, newDesktopId, cfg) {
+  Ext.on('ft.multidesktop.movetodesktop', function(oldDesktopId, newDesktopId, cfg) {
     const mainView = Ext.getApplication().getMainView();
 
     // TODO: Replace this w/ a 'callWhen'

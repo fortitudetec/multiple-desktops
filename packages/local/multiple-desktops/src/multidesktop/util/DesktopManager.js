@@ -30,7 +30,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
     this.setDesktopId(window.desktop.desktopId);
     window.desktop.parentDesktopId && this.setParentDesktopId(window.desktop.parentDesktopId);
 
-    Ext.on('desktop.launched', this.onLaunched.bind(this));
+    Ext.on('ft.multidesktop.launched', this.onLaunched.bind(this));
   },
 
   closeWidget: function(desktop, widgetId) {
@@ -40,7 +40,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
       const widget = Ext.getCmp(widgetId);
       widget && widget.close();
     } else {
-      Ext.fireEvent({source: myId, target: targetDesktopId, eventName: 'desktop.closewidget'}, targetDesktopId, widgetId);
+      Ext.fireEvent({source: myId, target: targetDesktopId, eventName: 'ft.multidesktop.closewidget'}, targetDesktopId, widgetId);
     }
   },
 
@@ -48,10 +48,10 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
     if (this.getParentDesktopId()) {
       window.addEventListener('unload', this.onUnloadChild.bind(this));
       Ext.on({
-        'desktop.close': () => window.close(),
-        'desktop.childregistered': this.onRegistered.bind(this),
+        'ft.multidesktop.close': () => window.close(),
+        'ft.multidesktop.childregistered': this.onRegistered.bind(this),
         // We only need to listen for 'closewidget' in the children because the event is only fired from the parent.
-        'desktop.closewidget': this.onCloseWidget.bind(this)
+        'ft.multidesktop.closewidget': this.onCloseWidget.bind(this)
       });
     } else {
       const myId = this.getDesktopId();
@@ -63,18 +63,18 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
 
       this.initializeLocalStorage(myId);
       Ext.on({
-        'desktop.registerchild': this.onRegisterChildDesktop,
-        'desktop.ping': (desktopId) => {
-          Ext.fireEvent({source: myId, target: desktopId, eventName: 'desktop.pong'}, desktopId);
+        'ft.multidesktop.registerchild': this.onRegisterChildDesktop,
+        'ft.multidesktop.ping': (desktopId) => {
+          Ext.fireEvent({source: myId, target: desktopId, eventName: 'ft.multidesktop.pong'}, desktopId);
         },
         scope: this
       });
     }
 
     Ext.on({
-      'desktop.tofront': () => window.alert(window.document.title),
-      'desktop.closing': this.onDeregisterChildDesktop,
-      'desktop.queryrunningwidgets': this.onListRunningWidgets,
+      'ft.multidesktop.tofront': () => window.alert(window.document.title),
+      'ft.multidesktop.closing': this.onDeregisterChildDesktop,
+      'ft.multidesktop.queryrunningwidgets': this.onListRunningWidgets,
       scope: this
     });
     this.storageEventListener = this.onResetDesktopEnvironment.bind(this);
@@ -117,7 +117,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
     const deferred = new Ext.Deferred(),
       myId = this.getDesktopId(),
       responseListener = Ext.on({
-        'desktop.queryrunningwidgetsresponse': (source, response) => {
+        'ft.multidesktop.queryrunningwidgetsresponse': (source, response) => {
           deferred.resolve(response);
           responseListener.destroy();
         },
@@ -127,7 +127,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
     Ext.fireEvent({
       target: desktopToQuery,
       source: myId,
-      eventName: 'desktop.queryrunningwidgets'
+      eventName: 'ft.multidesktop.queryrunningwidgets'
     }, myId);
 
     return deferred.promise;
@@ -138,7 +138,9 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
       Ext.raise(`Attempt to relocate a non-movable Widget: ${widget.getId()}`);
       return;
     }
-    const desktopChooserBtn = this.getDesktopChooserBtn(),
+    const desktops = this.getDesktops(),
+      toDesktop = desktops.getById(toDesktopId),
+      desktopChooserBtn = this.getDesktopChooserBtn(),
       fromDesktopId = this.getDesktopId(),
       // Done like this so the 'initialConfig' can override the xtype, but not the ownerWidget. This is because once the widget begins
       // traversing Desktops, it's 'ownerWidget' becomes part of the initialConfig. But...if the ownerWidget moves, it is updated on the
@@ -148,10 +150,11 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
       controller = widget.lookupController(),
       deferred = new Ext.Deferred();
 
+    widget.setLoading(`Moving to ${toDesktop.get('title')}`);
     controller && Ext.Object.merge(widgetCfg, controller.getMovableConfigItems());
     widget.isMoving = true;
     const listener = Ext.on({
-      'desktop.movetodesktopsuccess': (from, to, config, widgetId) => {
+      'ft.multidesktop.movetodesktopsuccess': (from, to, config, widgetId) => {
         const qs1 = Ext.Object.toQueryString(widgetCfg, true),
           qs2 = Ext.Object.toQueryString(config, true);
 
@@ -171,7 +174,8 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
           deferred.resolve(widgetId);
         }
       },
-      'desktop.movetodesktopfailure': (from, to, config, error) => {
+      'ft.multidesktop.movetodesktopfailure': (from, to, config, error) => {
+        widget.setLoading(false);
         const qs1 = Ext.Object.toQueryString(widgetCfg, true),
           qs2 = Ext.Object.toQueryString(config, true);
         if (from === fromDesktopId && to === toDesktopId && qs1 === qs2) {
@@ -181,8 +185,9 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
       },
       destroyable: true
     });
+
     Ext.fireEvent({
-      eventName: 'desktop.movetodesktop',
+      eventName: 'ft.multidesktop.movetodesktop',
       source: fromDesktopId,
       target: toDesktopId
     }, fromDesktopId, toDesktopId, widgetCfg);
@@ -219,7 +224,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
 
     Ext.GlobalEvents.setBroadcastChannelId(`${application.getName()}-${parentDesktopId || desktopId}`);
     this.initializeDesktop(desktopId);
-    parentDesktopId && Ext.fireEvent({source: desktopId, target: parentDesktopId, eventName: 'desktop.registerchild'}, desktopId);
+    parentDesktopId && Ext.fireEvent({source: desktopId, target: parentDesktopId, eventName: 'ft.multidesktop.registerchild'}, desktopId);
   },
 
   onListRunningWidgets: function(requestingDesktop) {
@@ -239,7 +244,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
     Ext.fireEvent({
       target: requestingDesktop,
       source: myId,
-      eventName: 'desktop.queryrunningwidgetsresponse'
+      eventName: 'ft.multidesktop.queryrunningwidgetsresponse'
     }, myId, widgets);
   },
 
@@ -328,7 +333,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
    */
   closeDesktop: function(desktop) {
     const myId = this.getDesktopId();
-    Ext.fireEvent({source: myId, target: desktop.getId(), eventName: 'desktop.close'}, myId);
+    Ext.fireEvent({source: myId, target: desktop.getId(), eventName: 'ft.multidesktop.close'}, myId);
   },
 
   onBeforeUnloadParent: function(evt) {
@@ -493,7 +498,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
     const desktops = this.getDesktops();
 
     Ext.fireEvent(
-        {source: this.getDesktopId(), eventName: 'desktop.childregistered'},
+        {source: this.getDesktopId(), eventName: 'ft.multidesktop.childregistered'},
         childId, desktops.getData().getValues('data'), Ft.multidesktop.util.DesktopManager.VERSION);
 
     // Fire a local event. This is really for the 'Launch a new Desktop and move my Widget there' feature.
@@ -506,7 +511,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
       sessionStorage = Ext.JSON.decode(window.localStorage.getItem(localStorageId), true);
 
     this.getDesktops().each((desktop) => {
-      Ext.fireEvent({source: myId, target: desktop.getId(), eventName: 'desktop.close'}, myId);
+      Ext.fireEvent({source: myId, target: desktop.getId(), eventName: 'ft.multidesktop.close'}, myId);
     });
 
     if (sessionStorage && Ext.Array.contains(sessionStorage.sessions, myId)) {
@@ -587,7 +592,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
     const desktopId = this.getDesktopId(),
       pingPongTimer = Ext.defer(this.onOrphanedDesktop.bind(this), 5000),
       pingPongListener = Ext.on({
-        'desktop.pong': (targetDesktopId) => {
+        'ft.multidesktop.pong': (targetDesktopId) => {
           if (targetDesktopId === desktopId) {
             console.log(`received pong response from parent desktop on ${new Date()}`);
             Ext.undefer(pingPongTimer);
@@ -600,7 +605,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
     Ext.fireEvent({
       source: desktopId,
       target: this.getParentDesktopId(),
-      eventName: 'desktop.ping'
+      eventName: 'ft.multidesktop.ping'
     }, desktopId);
   },
 
@@ -629,7 +634,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
     const myId = this.getDesktopId();
     // Fire an iternal event first so all our widgets have an opportunity to notify any owner widgets we're closing
     this.fireEvent('closing', myId);
-    Ext.fireEvent({source: myId, eventName: 'desktop.closing'}, myId);
+    Ext.fireEvent({source: myId, eventName: 'ft.multidesktop.closing'}, myId);
   },
 
   privates: {
@@ -663,7 +668,7 @@ Ext.define('Ft.multidesktop.util.DesktopManager', {
           text: title,
           itemId: `ft-multidesktop-${id}`,
           tooltip: `Bring desktop ${title} to the front`,
-          handler: () => Ext.fireEvent({source: myId, target: id, eventName: 'desktop.tofront'})
+          handler: () => Ext.fireEvent({source: myId, target: id, eventName: 'ft.multidesktop.tofront'})
         });
       });
     },

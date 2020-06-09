@@ -37,9 +37,9 @@ Ext.define('Ft.multidesktop.ui.desktopmanager.Controller', {
     this.lookup('activeDesktops').getSelectionModel().select(0);
 
     this.globalListeners = Ext.on({
-      'desktop.movablewidgetlaunched': this.onWidgetLaunched,
-      'desktop.movetodesktopsuccess': this.onWidgetMovedToDesktop,
-      'desktop.windowclosing': this.onWidgetClosing,
+      'ft.multidesktop.movablewidgetlaunched': this.onWidgetLaunched,
+      'ft.multidesktop.movetodesktopsuccess': this.onWidgetMovedToDesktop,
+      'ft.multidesktop.windowclosing': this.onWidgetClosing,
       scope: this,
       destroyable: true
     });
